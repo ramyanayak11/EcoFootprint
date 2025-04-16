@@ -17,6 +17,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-6">
           <Link href="/" className="text-white hover:text-green-900">Home</Link>
           <Link href="/dashboard" className="text-white hover:text-green-900">Dashboard</Link>
+          <Link href="/goal_settings" className="text-white hover:text-green-900">Goals</Link>
 
           {/* Profile Dropdown */}
           <div className="relative">

@@ -24,7 +24,7 @@ export default function Dashboard() {
   };
 
   
-  /**
+  /** 
   // 🔥 Fetch real news from your API
   useEffect(() => {
     const fetchNews = async () => {
@@ -39,7 +39,8 @@ export default function Dashboard() {
 
     fetchNews();
   }, []);
-  */
+  
+*/
 
   return (
     <div className="min-h-screen bg-green-50 text-green-900 p-6">
