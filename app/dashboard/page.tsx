@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
@@ -133,6 +134,17 @@ export default function Dashboard() {
             )}
           </ul>
         </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6 col-span-1 md:col-span-2">
+          <div className="flex justify-center">
+            <Link href="/achievements">
+              <button className="px-6 py-3 rounded-lg text-lg font-semibold bg-green-600 hover:bg-green-700 transition">
+                View My Achievements
+              </button>
+            </Link>
+            </div>
+        </div>
+
       </div>
     </div>
   );
