@@ -1,4 +1,3 @@
-// eslint.config.js or .eslintrc.js (for FlatConfig with @eslint/eslintrc)
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -15,7 +14,7 @@ const eslintConfig = [
   {
     rules: {
       "@typescript-eslint/no-unused-vars": [
-        "warn", // or "off" if you want to disable it completely
+        "warn",
         {
           vars: "all",
           args: "after-used",
@@ -24,6 +23,7 @@ const eslintConfig = [
           varsIgnorePattern: "^_",
         },
       ],
+      "react/no-unescaped-entities": "off", // ⛔ disable JSX quote escaping
     },
   },
 ];
