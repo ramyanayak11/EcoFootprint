@@ -1,16 +1,59 @@
 "use client"
 import { useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
+import router from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
   
-    const handleSignUp = () => {
-      // Handle sign up logic later
-      console.log("Signing up...");
-    };
+    /**
+       const handleSignUp = async () => {
+        if (password !== confirmPassword) {
+          alert("Passwords do not match");
+          return;
+        }
+      
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+      
+        const data = await res.json();
+      
+        if (res.ok) {
+          alert("Account created. You can log in now.");
+        } else {
+          alert(data.error || "Something went wrong.");
+        }
+      };
+     */
+
+      const handleSignUp = async () => {
+        if (password !== confirmPassword) {
+          alert("Passwords do not match");
+          return;
+        }
+      
+        // Step 1: Sign up the user
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+      
+        if (error) {
+          alert(error.message);
+          return;
+        }
+      
+        // ✅ No profile insert yet!
+        alert("Account created! Please check your email and confirm your account before logging in.");
+      };
+    
   
     return (
         <div 

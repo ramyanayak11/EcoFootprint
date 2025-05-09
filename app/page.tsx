@@ -7,8 +7,9 @@
 // }
 
 import Homepage from "./homepage/page";
+import Login from "./login";
 
 export default function Home() {
-  return <Homepage />;
+  return <Login />;
 }
 

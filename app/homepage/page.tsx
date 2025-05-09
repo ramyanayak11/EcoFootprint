@@ -28,7 +28,7 @@ export default function HomePage() {
                 Get Started
               </button>
             </Link>
-            <Link href="/login">
+            <Link href="/">
               <button className="px-6 py-3 rounded-lg text-lg font-semibold bg-white text-green-700 hover:bg-gray-100 transition">
                 Login
               </button>
