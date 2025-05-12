@@ -1,8 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { motion } from "framer-motion";
 
 const CO2_LOOKUP: Record<string, number> = {
   "Used Public Transport": 2.5,
@@ -47,9 +49,7 @@ export default function Dashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) {
-        router.push("/");
-      }
+      if (error || !data?.user) router.push("/");
     };
     checkAuth();
   }, [router]);
@@ -58,7 +58,6 @@ export default function Dashboard() {
     const fetchUserData = async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) return;
-
       const uid = userData.user.id;
       setUserId(uid);
 
@@ -66,21 +65,16 @@ export default function Dashboard() {
         .from("activities")
         .select("activity")
         .eq("user_id", uid);
-      const fetchedActivities = activityData?.map((row) => row.activity) || [];
-      setActivities(fetchedActivities);
+      setActivities(activityData?.map((row) => row.activity) || []);
 
       const { data: emissionData } = await supabase
         .from("custom_emissions")
         .select("*")
         .eq("user_id", uid);
-
-      const emissionMap: Record<string, number> = {};
-      emissionData?.forEach((row) => {
-        emissionMap[row.activity] = row.co2_value;
-      });
-      setCustomEmissions(emissionMap);
+      const map: Record<string, number> = {};
+      emissionData?.forEach((row) => (map[row.activity] = row.co2_value));
+      setCustomEmissions(map);
     };
-
     fetchUserData();
   }, []);
 
@@ -94,21 +88,15 @@ export default function Dashboard() {
         console.error("Failed to fetch news:", error);
       }
     };
-
     fetchNews();
   }, []);
 
   const handleLog = async (activity: string, customCO2?: number) => {
     if (!userId) return;
-
     const { error } = await supabase.from("activities").insert([
       { activity, user_id: userId, date: new Date().toISOString() },
     ]);
-    if (error) {
-      console.error("Failed to log activity:", error.message);
-      return;
-    }
-
+    if (error) return console.error("Failed to log:", error.message);
     if (customCO2 !== undefined) {
       await supabase
         .from("custom_emissions")
@@ -117,7 +105,6 @@ export default function Dashboard() {
         });
       setCustomEmissions((prev) => ({ ...prev, [activity]: customCO2 }));
     }
-
     setActivities((prev) => [...prev, activity]);
   };
 
@@ -138,7 +125,12 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Activity Logger */}
-        <div className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6"
+        >
           <h3 className="text-xl font-semibold mb-4 text-green-900">🌱 Log Your Activity</h3>
 
           <div className="flex flex-col gap-2 mb-4">
@@ -203,10 +195,15 @@ export default function Dashboard() {
               Estimated CO₂ Saved: <span className="font-bold">{totalCO2Saved.toFixed(1)} kg</span>
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* News */}
-        <div className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6"
+        >
           <h3 className="text-xl font-semibold mb-4 text-green-900">🌍 Environmental News</h3>
           <ul className="space-y-4">
             {news.length === 0 ? (
@@ -215,16 +212,20 @@ export default function Dashboard() {
               news.map((article, index) => (
                 <li key={index} className="border-l-4 border-green-500 pl-4">
                   <p className="font-medium text-green-800">{article.title}</p>
-                  <p className="text-sm text-gray-500">Source: {article.source}</p>
+                  <p className="text-sm text-gray-500">Source: {article.source_url}</p>
                 </li>
               ))
             )}
           </ul>
-        </div>
+        </motion.div>
 
         {/* Achievements CTA */}
-        <div className="bg-white/30 backdrop-blur-md rounded-lg shadow-lg p-6 col-span-1 md:col-span-2">
-
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="bg-white/30 backdrop-blur-md rounded-lg shadow-lg p-6 col-span-1 md:col-span-2"
+        >
           <div className="flex justify-center">
             <Link href="/achievements">
               <button className="px-6 py-3 rounded-lg text-lg font-semibold bg-green-600 text-white hover:bg-green-700 transition">
@@ -232,7 +233,7 @@ export default function Dashboard() {
               </button>
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

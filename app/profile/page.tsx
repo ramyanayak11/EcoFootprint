@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -10,9 +11,10 @@ export default function ProfilePage() {
   const [profilePic, setProfilePic] = useState("/profile.png");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
 
-  // 🚨 Route guard
+  // ✅ Route guard
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -23,14 +25,12 @@ export default function ProfilePage() {
     checkAuth();
   }, [router]);
 
-  // Fetch profile info
+  // ✅ Fetch profile info
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: userData, error: userError } = await supabase.auth.getUser();
 
-      if (userError || !userData?.user) {
-        return;
-      }
+      if (userError || !userData?.user) return;
 
       const currentUser = userData.user;
       setUser(currentUser);
@@ -105,18 +105,21 @@ export default function ProfilePage() {
       return;
     }
 
-    alert("Profile updated successfully!");
+    // ✅ Show success message
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 4000);
   };
 
   return (
-    <div
-    className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6 flex justify-center items-start pt-24"
-  
-    style={{ backgroundImage: `url('/green.jpg')` }}
-  >
-  
-      <div className="bg-white rounded-lg shadow-md p-8 max-w-lg w-full">
+    <div className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat p-6 flex justify-center items-start pt-24 text-green-900">
+      <div className="bg-white/80 rounded-lg shadow-md p-8 max-w-lg w-full backdrop-blur-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Edit Profile</h2>
+
+        {showSuccess && (
+          <div className="mb-4 p-3 bg-green-100 text-green-800 border border-green-300 rounded text-sm text-center">
+            ✅ Profile updated successfully!
+          </div>
+        )}
 
         <div className="flex flex-col items-center mb-6">
           <img

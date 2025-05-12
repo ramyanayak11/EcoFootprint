@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import MonthlySummary from "./monthlySummary";
-import { useRouter } from "next/navigation"; // 🚨 Needed for redirection
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface Goal {
   id: number;
@@ -23,9 +24,8 @@ export default function GoalSettingsPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter(); // 👈 used to redirect unauthenticated users
+  const router = useRouter();
 
-  // 🚨 Route guard
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -36,44 +36,28 @@ export default function GoalSettingsPage() {
     checkAuth();
   }, [router]);
 
-  // First fetch user id
   useEffect(() => {
     const fetchUser = async () => {
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError || !userData?.user) {
-        console.error("User not found. Redirecting to login...");
-        return;
-      }
+      if (userError || !userData?.user) return;
       setUserId(userData.user.id);
     };
-
     fetchUser();
   }, []);
 
-  // Then fetch goals once userId is available
   useEffect(() => {
-    if (!userId) return;
-    fetchGoals();
+    if (userId) fetchGoals();
   }, [userId]);
 
   const fetchGoals = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("goals")
-      .select("*")
-      .eq("user_id", userId);
-
-    if (error) {
-      console.error("Error fetching goals:", error.message);
-    } else {
-      setGoals(data || []);
-    }
+    const { data, error } = await supabase.from("goals").select("*").eq("user_id", userId);
+    if (!error) setGoals(data || []);
     setLoading(false);
   };
 
   const addGoal = async () => {
     if (!newGoal.trim() || !category || !userId) return;
-
     const { error } = await supabase.from("goals").insert([
       {
         user_id: userId,
@@ -83,39 +67,18 @@ export default function GoalSettingsPage() {
         category,
       },
     ]);
-
-    if (error) {
-      console.error("Error adding goal:", error.message);
-    } else {
-      fetchGoals();
-    }
-
-    setNewGoal("");
-    setDeadline("");
-    setCategory("");
+    if (!error) fetchGoals();
+    setNewGoal(""); setDeadline(""); setCategory("");
   };
 
   const toggleCompleted = async (goal: Goal) => {
-    const { error } = await supabase
-      .from("goals")
-      .update({ completed: !goal.completed })
-      .eq("id", goal.id);
-
-    if (error) {
-      console.error("Error toggling goal:", error.message);
-    } else {
-      fetchGoals();
-    }
+    await supabase.from("goals").update({ completed: !goal.completed }).eq("id", goal.id);
+    fetchGoals();
   };
 
   const deleteGoal = async (goalId: number) => {
-    const { error } = await supabase.from("goals").delete().eq("id", goalId);
-
-    if (error) {
-      console.error("Error deleting goal:", error.message);
-    } else {
-      fetchGoals();
-    }
+    await supabase.from("goals").delete().eq("id", goalId);
+    fetchGoals();
   };
 
   const total = goals.length;
@@ -124,12 +87,29 @@ export default function GoalSettingsPage() {
   const completionRate = ((completed / (total || 1)) * 100).toFixed(0);
 
   return (
-    <div className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6">
-      <h2 className="text-2xl font-bold mb-6 text-green-100">Eco Goal Settings</h2>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7 }}
+      className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6"
+    >
+      <motion.h2
+        className="text-2xl font-bold mb-6 text-green-100"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Eco Goal Settings
+      </motion.h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left side: Goal Form & List */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        {/* Left side */}
+        <motion.div
+          className="bg-white rounded-lg shadow-md p-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
           <h3 className="text-xl font-semibold mb-4">Set a New Goal</h3>
 
           <div className="flex flex-col gap-3 mb-3">
@@ -175,9 +155,12 @@ export default function GoalSettingsPage() {
           ) : (
             <ul className="space-y-2">
               {goals.map((goal) => (
-                <li
+                <motion.li
                   key={goal.id}
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-l-4 border-green-500 pl-3 py-2 bg-green-100 rounded"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -192,7 +175,9 @@ export default function GoalSettingsPage() {
                       </p>
                       <div className="text-xs text-gray-600 space-y-1">
                         {goal.deadline && <p>Due: {goal.deadline}</p>}
-                        <p>Category: <span className="font-semibold">{goal.category}</span></p>
+                        <p>
+                          Category: <span className="font-semibold">{goal.category}</span>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -202,21 +187,27 @@ export default function GoalSettingsPage() {
                   >
                     Delete
                   </button>
-                </li>
+                </motion.li>
               ))}
             </ul>
           )}
-        </div>
+        </motion.div>
 
-        {/* Right side: Monthly Summary */}
-        <MonthlySummary
-          goals={goals}
-          total={total}
-          completed={completed}
-          planned={planned}
-          completionRate={completionRate}
-        />
+        {/* Right side */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <MonthlySummary
+            goals={goals}
+            total={total}
+            completed={completed}
+            planned={planned}
+            completionRate={completionRate}
+          />
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
