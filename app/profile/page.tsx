@@ -109,7 +109,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-green-50 text-green-900 p-6 flex justify-center items-start pt-24">
+    <div
+    className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6 flex justify-center items-start pt-24"
+  
+    style={{ backgroundImage: `url('/green.jpg')` }}
+  >
+  
       <div className="bg-white rounded-lg shadow-md p-8 max-w-lg w-full">
         <h2 className="text-2xl font-bold mb-6 text-center">Edit Profile</h2>
 

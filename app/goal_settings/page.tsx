@@ -124,8 +124,8 @@ export default function GoalSettingsPage() {
   const completionRate = ((completed / (total || 1)) * 100).toFixed(0);
 
   return (
-    <div className="min-h-screen bg-green-50 text-green-900 p-6">
-      <h2 className="text-2xl font-bold mb-6">Eco Goal Settings</h2>
+    <div className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6">
+      <h2 className="text-2xl font-bold mb-6 text-green-100">Eco Goal Settings</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left side: Goal Form & List */}

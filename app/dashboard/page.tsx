@@ -44,7 +44,6 @@ export default function Dashboard() {
   const [customEmissions, setCustomEmissions] = useState<Record<string, number>>({});
   const router = useRouter();
 
-  // ✅ Check if user is logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -110,13 +109,12 @@ export default function Dashboard() {
       return;
     }
 
-    // Insert emission if it's a new custom activity
     if (customCO2 !== undefined) {
       await supabase
         .from("custom_emissions")
-        .upsert([
-          { activity, user_id: userId, co2_value: customCO2 }
-        ], { onConflict: "activity, user_id" });
+        .upsert([{ activity, user_id: userId, co2_value: customCO2 }], {
+          onConflict: "activity, user_id",
+        });
       setCustomEmissions((prev) => ({ ...prev, [activity]: customCO2 }));
     }
 
@@ -132,15 +130,16 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-green-50 text-green-900 p-6">
+    <div className="min-h-screen w-full bg-[url('/green.jpg')] bg-cover bg-center bg-no-repeat text-green-900 p-6">
       <div className="flex items-center space-x-4 mb-6">
         <img src="/profile.png" alt="Profile" className="w-12 h-12 rounded-full border-2 border-green-700" />
-        <h2 className="text-2xl font-bold">Welcome Back!</h2>
+        <h2 className="text-2xl font-bold text-white drop-shadow-lg">Welcome Back!</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold mb-4">🌱 Log Your Activity</h3>
+        {/* Activity Logger */}
+        <div className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-green-900">🌱 Log Your Activity</h3>
 
           <div className="flex flex-col gap-2 mb-4">
             <input
@@ -150,15 +149,16 @@ export default function Dashboard() {
               onChange={(e) => setCustomActivity(e.target.value)}
               className="p-2 border rounded bg-gray-100 text-black"
             />
-            {customActivity && !(CO2_LOOKUP[customActivity] || customEmissions[customActivity]) && (
-              <input
-                type="number"
-                placeholder="Enter CO₂ saved (kg)"
-                value={customEmission}
-                onChange={(e) => setCustomEmission(e.target.value)}
-                className="p-2 border rounded bg-gray-100 text-black"
-              />
-            )}
+            {customActivity &&
+              !(CO2_LOOKUP[customActivity] || customEmissions[customActivity]) && (
+                <input
+                  type="number"
+                  placeholder="Enter CO₂ saved (kg)"
+                  value={customEmission}
+                  onChange={(e) => setCustomEmission(e.target.value)}
+                  className="p-2 border rounded bg-gray-100 text-black"
+                />
+              )}
             <button
               onClick={() => {
                 if (!customActivity.trim()) return;
@@ -191,7 +191,7 @@ export default function Dashboard() {
           </button>
 
           <div className="mt-6">
-            <h4 className="font-semibold mb-2">Your Logs</h4>
+            <h4 className="font-semibold mb-2 text-green-800">Your Logs</h4>
             <ul className="list-disc pl-6 text-sm text-green-800 space-y-1">
               {activities.length === 0 ? (
                 <li>No logs yet.</li>
@@ -199,22 +199,22 @@ export default function Dashboard() {
                 activities.map((act, idx) => <li key={idx}>{act}</li>)
               )}
             </ul>
-            <p className="mt-4 text-green-700 font-medium">
+            <p className="mt-4 text-green-900 font-medium">
               Estimated CO₂ Saved: <span className="font-bold">{totalCO2Saved.toFixed(1)} kg</span>
             </p>
           </div>
         </div>
 
         {/* News */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold mb-4">🌍 Environmental News</h3>
+        <div className="bg-white/70 backdrop-blur-md rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-green-900">🌍 Environmental News</h3>
           <ul className="space-y-4">
             {news.length === 0 ? (
               <p className="text-sm text-gray-500">Loading news...</p>
             ) : (
               news.map((article, index) => (
                 <li key={index} className="border-l-4 border-green-500 pl-4">
-                  <p className="font-medium">{article.title}</p>
+                  <p className="font-medium text-green-800">{article.title}</p>
                   <p className="text-sm text-gray-500">Source: {article.source}</p>
                 </li>
               ))
@@ -222,7 +222,9 @@ export default function Dashboard() {
           </ul>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 col-span-1 md:col-span-2">
+        {/* Achievements CTA */}
+        <div className="bg-white/30 backdrop-blur-md rounded-lg shadow-lg p-6 col-span-1 md:col-span-2">
+
           <div className="flex justify-center">
             <Link href="/achievements">
               <button className="px-6 py-3 rounded-lg text-lg font-semibold bg-green-600 text-white hover:bg-green-700 transition">

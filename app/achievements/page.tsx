@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RocketIcon, FlameIcon } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import clsx from "clsx";
-import { useRouter } from "next/navigation"; // ✅ Needed to redirect unauthenticated users
+import { useRouter } from "next/navigation";
 
 const BADGE_MILESTONE = 5;
 
@@ -26,9 +26,6 @@ export default function GamificationPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const router = useRouter();
 
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
-
-  // ✅ Route protection
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -42,10 +39,7 @@ export default function GamificationPage() {
   useEffect(() => {
     const fetchGamificationData = async () => {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) {
-        console.error("No user session");
-        return;
-      }
+      if (!userData?.user) return;
 
       const userId = userData.user.id;
 
@@ -77,24 +71,27 @@ export default function GamificationPage() {
   if (!isLoaded) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="animate-pulse text-green-700 text-lg">Loading your eco achievements...</p>
+        <p className="animate-pulse text-white text-lg">Loading your eco achievements...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-green-50 to-green-100 p-6 space-y-10">
+    <div
+      className="min-h-screen bg-cover bg-center p-6 space-y-10"
+      style={{ backgroundImage: "url('/green.jpg')" }}
+    >
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-green-900">🌿 Eco Journey</h1>
-        <p className="text-green-700">Track your progress, earn badges, and stay green!</p>
+      <div className="text-center space-y-2 text-white drop-shadow-lg">
+        <h1 className="text-4xl font-bold">🌿 Eco Journey</h1>
+        <p className="text-white/90">Track your progress, earn badges, and stay green!</p>
       </div>
 
       {/* Streak */}
-      <Alert className="max-w-md mx-auto bg-green-100">
-        <FlameIcon className="h-5 w-5 text-red-500" />
-        <AlertTitle>Daily Streak</AlertTitle>
-        <AlertDescription className="text-lg">
+      <Alert className="max-w-md mx-auto bg-black/60 text-white border border-white shadow-lg">
+        <FlameIcon className="h-5 w-5 text-orange-400" />
+        <AlertTitle className="text-white">Daily Streak</AlertTitle>
+        <AlertDescription className="text-white text-lg">
           🔥 {streak} {streak === 1 ? "day" : "days"} streak active!
         </AlertDescription>
       </Alert>
@@ -109,13 +106,13 @@ export default function GamificationPage() {
             <Card
               key={category}
               className={clsx(
-                "hover:scale-105 transition-transform",
+                "hover:scale-105 transition-transform backdrop-blur-lg bg-white/90",
                 earned ? "border-green-600" : "border-gray-300"
               )}
             >
               <CardHeader>
                 <div className="flex justify-center text-5xl">{emoji}</div>
-                <CardTitle className="text-center text-green-800">{category}</CardTitle>
+                <CardTitle className="text-center text-green-900">{category}</CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-2">
                 {earned ? (
@@ -123,12 +120,12 @@ export default function GamificationPage() {
                     {calculateBadges(count)} Badge{calculateBadges(count) > 1 ? "s" : ""}
                   </Badge>
                 ) : (
-                  <Badge variant="secondary" className="text-gray-500">
+                  <Badge variant="secondary" className="text-gray-500 bg-gray-200">
                     Not Yet Earned
                   </Badge>
                 )}
                 <Progress value={(count % BADGE_MILESTONE) * 20} />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-600">
                   {calculateProgressToNextBadge(count)} more to next badge
                 </p>
               </CardContent>
@@ -139,8 +136,9 @@ export default function GamificationPage() {
 
       {/* Call to Action */}
       <div className="flex justify-center">
-        <Button variant="default" className="bg-green-600 hover:bg-green-700">
-          <RocketIcon className="mr-2 h-5 w-5" /> Start a New Eco Challenge
+        <Button variant="default" className="bg-green-600 hover:bg-green-700 shadow-md text-white px-6 py-3 text-lg">
+          <RocketIcon className="mr-2 h-5 w-5" />
+          Start a New Eco Challenge
         </Button>
       </div>
     </div>
