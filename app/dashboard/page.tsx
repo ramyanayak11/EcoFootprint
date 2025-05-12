@@ -38,7 +38,8 @@ const EXTRA_ACTIVITIES = Object.keys(CO2_LOOKUP).filter(
 
 export default function Dashboard() {
   const [activities, setActivities] = useState<string[]>([]);
-  const [news, setNews] = useState<{ title: string; source: string }[]>([]);
+  const [news, setNews] = useState<{ title: string; source: string; source_url?: string }[]>([]);
+
   const [customActivity, setCustomActivity] = useState("");
   const [customEmission, setCustomEmission] = useState("");
   const [showMore, setShowMore] = useState(false);
